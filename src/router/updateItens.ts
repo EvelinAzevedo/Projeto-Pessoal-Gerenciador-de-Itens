@@ -6,18 +6,23 @@ export default async (req: Request, res: Response) => {
     const id = req.query.id as string
     const name = req.query.name as string
 
-    if (!id) return res.status(400).json({ error: 'ID é obrigatório' })
-    if (!name) return res.status(400).json({ error: 'Nome é obrigatório' })
+    if (!id || !name || name.trim() === '') {
+      return res.status(400).json({ error: 'ID e novo nome são obrigatórios' })
+    }
 
-    const items = await readData()
-    const itemIndex = items.findIndex((item: Item) => item.id === id)
+    const items: Item[] = await readData()
+    const index = items.findIndex(item => item.id === id)
 
-    if (itemIndex === -1) return res.status(404).json({ error: 'Item não encontrado' })
+    if (index === -1) {
+      return res.status(404).json({ error: 'Item não encontrado' })
+    }
 
-    items[itemIndex].name = name
+    items[index].name = name
     await writeData(items)
-    res.json(items[itemIndex])
+
+    return res.json(items[index])
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao atualizar item' })
+    console.error(error)
+    return res.status(500).json({ error: 'Erro ao atualizar item' })
   }
 }

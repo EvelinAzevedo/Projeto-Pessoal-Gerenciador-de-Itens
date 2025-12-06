@@ -4,8 +4,9 @@ import { readData } from './utils'
 export default async (req: Request, res: Response) => {
   try {
     const items = await readData()
-    res.json(items)
+    return res.json(items)
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao ler dados' })
+    console.error(error)
+    return res.status(500).json({ error: 'Erro ao recuperar itens' })
   }
 }
